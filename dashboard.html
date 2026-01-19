@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Sản Phẩm</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      padding: 30px;
+    }
+    
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+    
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+    
+    .btn-success {
+      background: #48bb78;
+      color: white;
+    }
+    
+    .btn-success:hover {
+      background: #38a169;
+    }
+    
+    .btn-danger {
+      background: #f56565;
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background: #e53e3e;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .stat-card h3 {
+      font-size: 14px;
+      margin-bottom: 10px;
+      opacity: 0.9;
+    }
+    
+    .stat-card .value {
+      font-size: 28px;
+      font-weight: bold;
+    }
+    
+    .table-container {
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    
+    th {
+      background: #f7fafc;
+      padding: 15px;
+      text-align: left;
+      font-weight: bold;
+      color: #333;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    
+    td {
+      padding: 15px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    tr:hover {
+      background: #f7fafc;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    .badge-available {
+      background: #c6f6d5;
+      color: #22543d;
+    }
+    
+    .badge-unavailable {
+      background: #fed7d7;
+      color: #742a2a;
+    }
+    
+    .badge-in-stock {
+      background: #bee3f8;
+      color: #2c5282;
+    }
+    
+    .badge-out-of-stock {
+      background: #fbd38d;
+      color: #7c2d12;
+    }
+    
+    .price {
+      color: #48bb78;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    .modal-content h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    .modal-buttons button {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📦 Quản Lý Sản Phẩm</h1>
+    
+    <div class="controls">
+      <button class="btn-primary" onclick="showAllProducts()">📋 Tất cả sản phẩm</button>
+      <button class="btn-success" onclick="showInStockProducts()">📦 Hàng còn trong kho</button>
+      <button class="btn-primary" onclick="showHighPriceProducts()">💎 Giá ≥ 30</button>
+      <button class="btn-primary" onclick="showAccessories()">🎧 Accessories</button>
+      <button class="btn-danger" onclick="showOutOfStock()">❌ Hết hàng</button>
+    </div>
+    
+    <div class="stats">
+      <div class="stat-card">
+        <h3>Tổng sản phẩm</h3>
+        <div class="value" id="totalProducts">0</div>
+      </div>
+      <div class="stat-card">
+        <h3>Danh mục</h3>
+        <div class="value" id="totalCategories">0</div>
+      </div>
+      <div class="stat-card">
+        <h3>Tổng giá trị kho</h3>
+        <div class="value" id="totalValue">0₫</div>
+      </div>
+      <div class="stat-card">
+        <h3>Sản phẩm còn hàng</h3>
+        <div class="value" id="inStockCount">0</div>
+      </div>
+    </div>
+    
+    <div class="table-container">
+      <table id="productsTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Tên sản phẩm</th>
+            <th>Giá</th>
+            <th>Số lượng</th>
+            <th>Danh mục</th>
+            <th>Trạng thái</th>
+            <th>Giá trị</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Dữ liệu sản phẩm
+    const products = [
+      { id: 1, name: "Laptop", price: 1000, quantity: 5, category: "Electronics", isAvailable: true },
+      { id: 2, name: "Mouse", price: 25, quantity: 15, category: "Accessories", isAvailable: true },
+      { id: 3, name: "Keyboard", price: 80, quantity: 0, category: "Accessories", isAvailable: false },
+      { id: 4, name: "Monitor", price: 300, quantity: 3, category: "Electronics", isAvailable: true },
+      { id: 5, name: "USB Cable", price: 10, quantity: 20, category: "Accessories", isAvailable: true },
+      { id: 6, name: "Headphones", price: 150, quantity: 2, category: "Electronics", isAvailable: true }
+    ];
+
+    function updateStats() {
+      const totalProducts = products.length;
+      const categories = new Set(products.map(p => p.category)).size;
+      const totalValue = products.reduce((sum, p) => sum + (p.price * p.quantity), 0);
+      const inStockCount = products.filter(p => p.quantity > 0).length;
+
+      document.getElementById('totalProducts').textContent = totalProducts;
+      document.getElementById('totalCategories').textContent = categories;
+      document.getElementById('totalValue').textContent = totalValue.toLocaleString('vi-VN') + '₫';
+      document.getElementById('inStockCount').textContent = inStockCount;
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('tbody');
+      tbody.innerHTML = '';
+
+      data.forEach(product => {
+        const row = document.createElement('tr');
+        const value = (product.price * product.quantity).toLocaleString('vi-VN');
+        const price = product.price.toLocaleString('vi-VN');
+        
+        const statusBadge = product.isAvailable 
+          ? `<span class="badge badge-available">✓ Đang bán</span>`
+          : `<span class="badge badge-unavailable">✗ Dừng bán</span>`;
+        
+        const stockBadge = product.quantity > 0
+          ? `<span class="badge badge-in-stock">Còn hàng</span>`
+          : `<span class="badge badge-out-of-stock">Hết hàng</span>`;
+
+        row.innerHTML = `
+          <td>${product.id}</td>
+          <td><strong>${product.name}</strong></td>
+          <td><span class="price">${price}₫</span></td>
+          <td>${product.quantity}</td>
+          <td>${product.category}</td>
+          <td>${statusBadge} ${stockBadge}</td>
+          <td><strong>${value}₫</strong></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function showAllProducts() {
+      renderTable(products);
+    }
+
+    function showInStockProducts() {
+      const filtered = products.filter(p => p.quantity > 0);
+      renderTable(filtered);
+    }
+
+    function showHighPriceProducts() {
+      const filtered = products.filter(p => p.price >= 30);
+      renderTable(filtered);
+    }
+
+    function showAccessories() {
+      const filtered = products.filter(p => p.category === "Accessories");
+      renderTable(filtered);
+    }
+
+    function showOutOfStock() {
+      const filtered = products.filter(p => p.quantity === 0);
+      renderTable(filtered);
+    }
+
+    // Khởi tạo
+    window.addEventListener('load', () => {
+      updateStats();
+      showAllProducts();
+    });
+  </script>
+</body>
+</html>
